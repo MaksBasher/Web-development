@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class='row' id="item_card_row">
+    {%for product in products %}
+    <div class="card" style="width: 18rem;  border-radius: 15px;">
+        <i class="fa-regular fa-heart fa-lg" id="card_fav"></i>
+        <img src="{{product.image.url}}" class="card-img-top" alt="placeholder">
+        <div class="card-body">
+            <a class="card-title" href="{% url 'product' product.slug %}"><h5 class="card-title" style="margin:0;">{{product.name}}</h5></a>
+            <div class="ratings">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-regular fa-star"></i>
+            </div>
+            <!-- <div class="card_location_container">
+                <div class="card_location">Store location:</div>
+                <div class="card_location_icon"><img src="{% static '/images/card_location.png' %}"></div>
+                <div class="card_location">Beijin,China</div>
+            </div> -->
+            <div class="card_price">
+                <div id="current_price">${{product.price|floatformat:2}}</div>
+                <div id="initial_price">${{product.price|floatformat:2}}</div>
+                {%for discount in discounts %}
+                <div class="card_discount">{{discount.discount_amount}}%</div>
+                {% endfor %}
+            </div>
+            <p class="card_available">Available in the store</p>
+            <hr class="card_hr">
+            <div class="card_buttons">
+                <button data-product={{product.product_id}} data-action="add" class="btn btn-primary update-cart" id="card_bootstrap_btn">Add to cart</button>
+                <a href="http://127.0.0.1:8000/checkout/" class="btn btn-primary" id="card_bootstrap_btn">Purchase</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}

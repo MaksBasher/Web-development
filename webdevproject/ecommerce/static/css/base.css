@@ -1,0 +1,272 @@
+li, a {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 24px;
+    text-decoration: none;
+    color: aliceblue;
+  }
+  
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0.85% 8.5%;
+    background-color: black;
+  }
+  
+.logo {
+    cursor: pointer;
+  }
+  
+.icons_list {
+    list-style: none;
+  }
+  
+.icons_list li{
+    display: inline-block;
+    padding-right: 61px;
+  }
+  
+.icon {
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+  }
+  
+.nav_links {
+    list-style: none;
+  }
+  
+.nav_links li {
+    display: inline-block;
+    padding-right: 61px;
+  }
+  
+.toggle-button {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 56px;
+    height: 36px;
+  }
+  
+.toggle-button .bar {
+    height: 3px;
+    width: 100%;
+    background-color: aliceblue;
+    border-radius: 10px;
+  }
+  
+.small_logo {
+    display: none
+  }
+  
+.logo_small {
+    display: none;
+  }
+
+.card-img-top {
+  width: 100%;
+  border-top-left-radius: calc(0.25rem - 1px);
+  border-top-right-radius: calc(0.25rem - 1px);
+  padding: 1rem;
+}
+
+/* Styles for the text on main page */
+.main_text {
+    padding: 3.5% 3.5%;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 128px;
+    text-align: center;
+    color: #000000;
+    line-height: 155px;
+}
+
+/* Styles for the news main page */
+#news_title {
+  cursor: pointer;
+  color: #323232;
+}
+
+#news_text{
+  color: #aaaaaa;
+}
+
+.news_image {
+  width: -webkit-fill-available;
+}
+
+#news_card{
+  border: none;
+}
+
+/* Styles for the news view page */
+#news_row{
+  justify-content: center;
+}
+
+
+
+/* Styles for categories page */
+
+/* Item cards */
+
+#item_card_row {
+  gap: 1rem;
+}
+
+#card_fav{
+  position: absolute;
+  padding-top: 2rem;
+  padding-left: 15.5rem;
+  cursor: pointer;
+}
+
+.card-title {
+  margin: 0;
+  color: #323232;
+}
+
+.card_location_container{
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  }
+  .card_location{
+    color: #525252;
+  }
+  .card_location_icon{
+    width: 20px;
+    height: 20px;
+  }
+
+.card_available{
+    color: #328f2a;
+    margin: 0;
+  }
+
+.card_price {
+  display: flex;
+  gap: 8px;
+}
+  #current_price{
+    color: #261E34 
+  }
+  .card_discount{
+    color: #FD451C;
+  }
+  #initial_price{
+    text-decoration-line: line-through;
+    color: #525252;
+  }
+
+.card_hr {
+  margin-top: 0;
+}
+
+.card_buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+  #card_bootstrap_btn {
+    width: -webkit-fill-available;
+    background-color: #323232;
+    border-color: #ffffff;
+    border-radius: 10px;
+    border: hidden;
+  }
+
+/* Styles for cart page */
+.box-element{
+	box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+	background-color: #fff;
+	border-radius: 4px;
+	padding: 10px;
+}
+
+.thumbnail{
+	width: 100%;
+	height: 200px;
+	-webkit-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+    -moz-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+    box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+}
+
+.product{
+	border-radius: 0 0 4px 4px;
+}
+
+.bg-dark{
+	background-color: #4f868c!important;
+}
+
+#cart-icon{
+	width:25px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#cart-total{
+	display: block;
+	text-align: center;
+	color:#fff;
+	background-color: red;
+	width: 20px;
+	height: 25px;
+	border-radius: 50%;
+	font-size: 14px;
+}
+
+.col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12{
+	margin-top: 10px;
+}
+
+.btn{
+	border-radius: 0;
+}
+
+.row-image{
+	width: 100px;
+}
+
+.form-field{
+	width:250px;
+	display: inline-block;
+	padding: 5px;
+}
+
+.cart-row{
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ececec;
+}
+
+.quantity{
+	display: inline-block;
+	font-weight: 700;
+	padding-right:10px;
+	
+
+}
+
+.chg-quantity{
+	width: 12px;
+	cursor: pointer;
+	display: block;
+	margin-top: 5px;
+	transition:.1s;
+}
+
+.chg-quantity:hover{
+	opacity: .6;
+}
+
+.hidden{
+	display: none!important;
+}

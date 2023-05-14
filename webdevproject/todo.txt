@@ -1,0 +1,6 @@
+1. Change registration form fields and delete username
+2. Change login page fields to email and password
+3. Add social media logins
+4. Add logout
+5. Add Password reset
+6. Change photo inside the item cart

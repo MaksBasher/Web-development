@@ -1,13 +1,32 @@
+{% extends "password/auth.html" %}
+
+{% block content %}
+
 {% load crispy_forms_tags %}         
-
-
+{% load static %}
 <!--Login--> 
-<div class="container py-5">
-    <h1>Login</h1>
-    <form method="POST">
-      {% csrf_token %}
-      {{ login_form|crispy }}
-      <p><button class="btn btn-primary" type="submit">Login</button></p>
-    </form>
-    <p class="text-center">Don't have an account? <a href="/register">Create an account</a>.</p>
+<div class="content">
+  <div id="header_logo">
+      <a href="{% url 'home' %}"><img src="{% static 'images/auth/auth_logo.png' %}"></a>
   </div>
+  <div class="signin_body_flex">
+      <div class="buttons_flex">
+          <a href="{% url 'register' %}"><div><button class="header_button" id="join">JOIN</button></div></a>
+          <div id="divider"></div>
+          <a href="{% url 'login' %}"><div><button class="header_button" id="signin">SIGN IN</button></div></a>
+      </div>
+      <form method="POST">
+        {% csrf_token %}
+        {{ login_form|crispy }}
+        <p><button class="signin_button" id="login" type='submit'> LOGIN </button></p>
+      </form>
+      <div class="pass_reset"><a href="{% url 'password_reset' %}">Forgot your password?</a></div>
+      <div class="else_sign">OR SIGN IN WITH...</div>
+      <div class="media_flex">
+          <button class="media_button"><img src="Google.png">GOOGLE</button>
+          <button class="media_button"><img src="Facebook.png">FACEBOOK</button>
+          <button class="media_button"><img src="Instagram.png">INSTAGRAM</button>
+      </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,13 +1,55 @@
+{% extends "password/auth.html" %}
+
+{% block content %}
+
 {% load crispy_forms_tags %}         
-
-
+{% load static %}
 <!--Register--> 
-<div class="container py-5">
-    <h1>Register</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ register_form|crispy }}                    
-        <p><button class="btn btn-primary" type="submit">Register</button></p>
-    </form>
-    <p class="text-center">If you already have an account, <a href="/login">login</a> instead.</p>
+<div class="content">
+    <div id="header_logo">
+        <a href="{% url 'home' %}"><img src="{% static 'images/auth/auth_logo.png' %}"></a>
+    </div>
+    <div class="signin_body_flex">
+        <div class="buttons_flex">
+            <a href="{% url 'register' %}"><div><button class="header_button" id="join">JOIN</button></div></a>
+            <div id="divider"></div>
+            <a href="{% url 'login' %}"><div><button class="header_button" id="signin">SIGN IN</button></div></a>
+        </div>
+        <div class="else_sign">REGISTER WITH...</div>
+        <div class="social_register_flex">
+            <div class="media_flex">
+                <button class="media_button"><img src="Google.png">GOOGLE</button>
+                <button class="media_button"><img src="Facebook.png">FACEBOOK</button>
+                <button class="media_button"><img src="Instagram.png">INSTAGRAM</button>
+            </div>
+            <div class="note">Signing up with social media is super quick. No extra passwords to remember - no brain fail. Don't worry, we'd never share any of your data or post anything on your behalf</div>
+        </div>
+        <div class="else_sign">OR REGISTER WITH YOUR EMAIL...</div>
+        <form method="POST">
+            {% csrf_token %}
+            {{ register_form|crispy }} 
+            <!-- <div class="form_flex" id="with_note">
+                <label>EMAIL ADRESS:</label>
+                <input type="text" id="fname" name="fname">
+                <div class="note">We'll send your order confirmation here</div>
+            </div>
+            <div class="form_flex">
+                <label>FIRST NAME:</label>
+                <input type="text" id="fname" name="fname">
+            </div>
+            <div class="form_flex">
+                <label>SECOND NAME:</label>
+                <input type="text" id="fname" name="fname">
+            </div>
+            <div class="form_flex" id="with_note">
+                <label>PASSWORD:</label>
+                <input type="text" id="fname" name="fname">
+                <div class="note">Must be 10 or more characters</div>
+            </div> -->
+            <div class="signing_button">
+                <div><button class="signin_button" id="register"> JOIN US </button></div>
+            </div>
+        </form>
+    </div>
 </div>
+{% endblock %}

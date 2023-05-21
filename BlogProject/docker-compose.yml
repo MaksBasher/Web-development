@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15.2
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    environment:
+      - PGPORT=${DATABASE_PORT}
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASS}
+    volumes:
+      -postgres_volumn:/var/lib/postgresql/DATABASE_NAME
+
+  api:
+    build: .
+    command: >
+      sh - c "python manage.py migrate &&
+            python manage.py collectstatic --noinput &&
+            gunicorn base.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+      
+  nginx:
+      build:args: ./nginx
+      volumes:
+        - ./static:/app/static
+        - ./media:/app/media
+      ports:
+        - 81:80
+      depends_on:
+        - web
+
+volumes:

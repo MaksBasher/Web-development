@@ -101,7 +101,7 @@ class Product(models.Model):
     slug = models.SlugField(max_length = 250, null = True, blank = True, unique=True)
     description = models.TextField(max_length=500)
     SKU = models.CharField(max_length=255)
-    price = models.FloatField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Product_Category, on_delete= models.CASCADE)
     stock_status = models.IntegerField(choices=ITEM_STATUS, default=0)
     discount_id = models.ForeignKey(Discount, on_delete=models.CASCADE)
@@ -113,6 +113,7 @@ class Product(models.Model):
     
     def __str__(self):
         return self.name
+    
     #auto slug
     def save(self, *args, **kwargs):
         if not self.slug:

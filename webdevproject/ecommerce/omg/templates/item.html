@@ -2,5 +2,86 @@
 {%load static %}
 
 {% block content%}
-The item will be displayed here
+<div class="left_section">
+    <div class="product_name">{{product.name}}</div>
+    <div class="colors">
+       <div class="colors_text">Colors:</div>
+       <div class="colors_circle" id="first_color"></div>
+       <div class="colors_circle" id="second_color"></div>
+       <div class="colors_circle" id="third_color"></div>
+    </div>
+    <div class="cart_button">
+        <button class="button">Add to Cart</button>
+    </div>
+</div>
+
+<div class="middle_bg"></div>
+<img class='product_image' src="{{product.image.url}}"> 
+<div class="arrows_body">
+    <div class="arrows_flex">
+        <div><img src="{% static '/images/item_page/arrow_left.png' %}"></div>
+        <div><img src="{% static '/images/item_page/arrow_right.png' %}"></div>
+    </div>
+</div>
+<div class="favprice">
+    <div class="fav_product_icon">
+        <img src="{% static '/images/fav_item.png' %}">
+    </div>
+    <div class="price">
+        ${{product.price}}<span id="orange_text">({{discount.discount_amount}})</span>
+    </div>
+</div>
+
+<div class="right_section_opened">
+
+    <button class="collapsible">
+        <div>Product info</div>
+    </button>
+    <div class="content">
+        <div class="review">
+            <div class="text" id="review_text">REVIEWS:</div>
+            <div>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-regular fa-star"></i>
+            </div>
+            <button class="open-button" onclick="openForm()">Leave your review</button>
+        </div>
+        <p class="text">{{product.description}}</p>
+    </div>
+
+    <button class="collapsible">
+        <div>Delivery info</div>
+    </button>
+    <div class="content">
+        <p class="text">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+
+    <button class="collapsible">
+        <div>Return policy</div>
+    </button>
+    <div class="content">
+        <p class="text">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+    </div>
+
+    <div class="form-popup" id="myForm">
+    <form action="/action_page.php" class="form-container">
+    <h1>Submit your review</h1>
+
+    <label for="email"><b>Your name</b></label>
+    <input type="text" placeholder="Write your name here" name="email" required>
+
+    <label for="psw"><b>Review</b></label>
+    <input type="password" placeholder="Write a review here" name="psw" required>
+
+    <button type="submit" class="btn">Submit</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </form>
+</div>
+<script type="text/javascript" src="{% static 'js/item.js' %}"></script>
 {%endblock%}

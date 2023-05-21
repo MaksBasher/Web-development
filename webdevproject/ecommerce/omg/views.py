@@ -1,15 +1,20 @@
-import json
-from django.shortcuts import  render, redirect, get_object_or_404
+from django.shortcuts import  render, redirect
 from django.views import generic
 from .models import *
 from django import forms
 from .forms import NewUserForm
 from django.contrib import messages
-from django.contrib.auth import login, authenticate 
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
-from django.views import View
+from django.core.mail import send_mail, BadHeaderError
+from django.template.loader import render_to_string
+from django.db.models.query_utils import Q
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+import json
 
 # Create your views here.
 
@@ -28,7 +33,7 @@ class NewsDetail(generic.DetailView):
     template_name = "news_detail.html"
     
 #Categories views 
-def category(request):
+def category(request):  
     products = Product.objects.all()
     discounts = Discount.objects.all()
     context = {'products': products, 
@@ -40,6 +45,39 @@ class ProductView(generic.DetailView):
     model = Product
     template_name = 'item.html'
     context_object_name = 'product'
+#def item(request, slug):
+    #products = Product.objects.all()
+    #discounts = Discount.objects.all()
+    #context = {'products': products, 
+    #           'discounts': discounts,
+    #           "slug": slug}
+    #return render(request, 'item.html', context)
+
+def updateItem(request):
+    data = json.loads (request.body)
+    productId = data['productId']
+    action = data['action']
+    print('Action:', action)
+    print('Product:', productId)
+    
+    customer = request.user.customer
+    product = Product.objects.get(product_id=productId)
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+    
+    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+    
+    if action == 'add':
+        orderItem.quantity = (orderItem.quantity + 1)
+    elif action == 'remove':
+        orderItem.quantity = (orderItem.quantity - 1)
+        
+    orderItem.save()
+    
+    if orderItem.quantity <= 0:
+        orderItem.delete()
+    
+    return JsonResponse ('Item was added', safe=False)
+
 
 #Tracking views
 def tracking(request):
@@ -53,21 +91,42 @@ def cart(request):
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer = customer, complete=False)
         items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
     else:
+        try:
+            cart = json.loads(request.COOKIES['cart'])
+        except:
+            cart = {}
+        print('Cart:',cart)
         items = []
-        order = {'get_cart_total':0,'get_cart_items':0}
+        order = {'get_cart_total':0,'get_cart_items':0, 'shipping':False}
+        cartItems = order ['get_cart_items']
+        
+        for i in cart:
+            cartItems += cart[i]['quantity']
+            
+            product = Product.objects.get(product_id = i)
+            total = (product.price * cart[i]["quantity"])
+        
+            order['get_cart_total'] += total
+            order['get_cart_items'] += cart[i]['quantity']
+            
+            item = {
+                'product':{
+                    'id':product.product_id,
+                    'name':product.name,
+                    'price':product.price,
+                    'imageURL':product.imageURL,
+                },
+                'quantity':cart[i]['quantity'],
+                'get_total':total
+            }
+            items.append(item)
         
     context = {'items':items,
-               'order':order}
+               'order':order,
+               'cartItems': cartItems}
     return render(request, 'cart.html', context)
-
-def updateItem(request):
-    data = json.loads(request.data)
-    productId = data['productId']
-    action = data['action']
-    print('Action:', action)
-    print('Product:', productId)
-    return JsonResponse('Item was added', safe=False)
 
 #Checkout views    
 def checkout(request):
@@ -87,7 +146,6 @@ def checkout(request):
 class NewUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
-
     class Meta:
         model = User
         fields = ("username", 
@@ -97,7 +155,6 @@ class NewUserForm(UserCreationForm):
                   "password1", 
                   "password2",
                   )
-
 
     def save(self, commit=True):
         user = super(NewUserForm, self).save(commit=False)
@@ -113,7 +170,7 @@ def register_request(request):
             user = form.save()
             login(request, user)
             messages.success(request, "Registration successful." )
-            return redirect("omg:home")
+            return redirect("home")
         messages.error(request, "Unsuccessful registration. Invalid information.")
     form = NewUserForm()
     return render (request=request, template_name="register.html", context={"register_form":form})
@@ -122,16 +179,48 @@ def login_request(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('email')
+            username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=email, password=password)
+            user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.info(request, f"You are now logged in as {email}.")
-                return redirect("omg:home")
+                messages.info(request, f"You are now logged in as {username}.")
+                return redirect("home")
             else:
-                messages.error(request,"Invalid email or password.")
-        else:
-            messages.error(request,"Invalid email or password.")
+                messages.error(request,"Invalid username or password.")
     form = AuthenticationForm()
     return render(request=request, template_name="login.html", context={"login_form":form})
+
+def logout_request(request):
+	logout(request)
+	messages.info(request, "You have successfully logged out.") 
+	return redirect("home")
+
+#Password reset views
+def password_reset_request(request):
+	if request.method == "POST":
+		password_reset_form = PasswordResetForm(request.POST)
+		if password_reset_form.is_valid():
+			data = password_reset_form.cleaned_data['email']
+			associated_users = User.objects.filter(Q(email=data))
+			if associated_users.exists():
+				for user in associated_users:
+					subject = "Password Reset Requested"
+					email_template_name = "password/password_reset_email.txt"
+					c = {
+					"email":user.email,
+					'domain':'127.0.0.1:8000',
+					'site_name': 'Website',
+					"uid": urlsafe_base64_encode(force_bytes(user.pk)),
+					"user": user,
+					'token': default_token_generator.make_token(user),
+					'protocol': 'http',
+					}
+					email = render_to_string(email_template_name, c)
+					try:
+						send_mail(subject, email, 'admin@example.com' , [user.email], fail_silently=False)
+					except BadHeaderError:
+						return HttpResponse('Invalid header found.')
+					return redirect ("/password_reset/done/")
+	password_reset_form = PasswordResetForm()
+	return render(request=request, template_name="password/password_reset.html", context={"password_reset_form":password_reset_form})

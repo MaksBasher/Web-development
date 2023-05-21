@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+  <div class="news_container">
     <div class="row">
         {% for news in news_list %}
         <div class="col-sm-6 mb-3 mb-sm-0">
@@ -9,10 +10,11 @@
             <div class="card-body">
                 <img src="{{news.image.url}}" class="card-img-top" alt="...">
                 <h5 class="card-title"><a href="{% url 'news_detail' news.slug  %}" id='news_title'>{{ news.title }}</a></h5>
-                <p class="card-text" id="news_text">Words by: {{ news.author }} | {{ news.created_on}}</p>
+                <p class="card-text" id="news_author">Words by: {{ news.author }} | {{ news.created_on}}</p>
             </div>
           </div>
         </div>
         {% endfor %}
     </div>
+  </div>
 {%endblock%}

@@ -2,40 +2,71 @@
 {% load static %}
 
 {% block content %}
-<div class='row' id="item_card_row">
-    {%for product in products %}
-    <div class="card" style="width: 18rem;  border-radius: 15px;">
-        <i class="fa-regular fa-heart fa-lg" id="card_fav"></i>
-        <img src="{{product.image.url}}" class="card-img-top" alt="placeholder">
-        <div class="card-body">
-            <a class="card-title" href="{% url 'product' product.slug %}"><h5 class="card-title" style="margin:0;">{{product.name}}</h5></a>
-            <div class="ratings">
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-regular fa-star"></i>
+<div class='container'>
+    <!--<div class="brand_description_body">
+        <div class="brand_description">
+            <div class="brand_logo">
+                <img src="Brand_logo.png">
             </div>
-            <!-- <div class="card_location_container">
-                <div class="card_location">Store location:</div>
-                <div class="card_location_icon"><img src="{% static '/images/card_location.png' %}"></div>
-                <div class="card_location">Beijin,China</div>
-            </div> -->
-            <div class="card_price">
-                <div id="current_price">${{product.price|floatformat:2}}</div>
-                <div id="initial_price">${{product.price|floatformat:2}}</div>
-                {%for discount in discounts %}
-                <div class="card_discount">{{discount.discount_amount}}%</div>
-                {% endfor %}
-            </div>
-            <p class="card_available">Available in the store</p>
-            <hr class="card_hr">
-            <div class="card_buttons">
-                <button data-product={{product.product_id}} data-action="add" class="btn btn-primary update-cart" id="card_bootstrap_btn">Add to cart</button>
-                <a href="http://127.0.0.1:8000/checkout/" class="btn btn-primary" id="card_bootstrap_btn">Purchase</a>
+            <div class="description_flex">
+                <div id="brand_name">
+                    Balenciaga
+                </div>
+                <div class="location_flex">
+                    <div>Location</div>
+                    <div><img src="Store_location.png"></div>
+                    <div>Beijin China</div>
+                </div>
+                <div class="items_count" id="available">
+                    123 items available
+                </div>
             </div>
         </div>
+    </div> 
+    <div class="brand_photos">
+        <div class="brand_photo"><img src="Brand_photo.png"></div>
+        <div class="brand_photo"><img src="Brand_photo.png"></div> 
+        <div class="brand_photo"><img src="Brand_photo.png"></div>
+        <div class="brand_photo" id="blur">
+             <img src="Brand_photo.png">
+         </div> 
+         <div class="blur_text">123+</div>
+     </div>  -->
+    <div class='row' id="item_card_row">
+        {%for product in products %}
+        <div class="card" style="width: 18rem;  border-radius: 15px;">
+            <i class="fa-regular fa-heart fa-lg" id="card_fav"></i>
+            <img src="{{product.image.url}}" class="card-img-top" alt="placeholder">
+            <div class="card-body">
+                <a class="card-title" href="{% url 'item' product.slug %}"><h5 class="card-title" style="margin:0;">{{product.name}}</h5></a>
+                <div class="ratings">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                </div>
+                <!-- <div class="card_location_container">
+                    <div class="card_location">Store location:</div>
+                    <div class="card_location_icon"><img src="{% static '/images/card_location.png' %}"></div>
+                    <div class="card_location">Beijin,China</div>
+                </div> -->
+                <div class="card_price">
+                    <div id="current_price">${{product.price|floatformat:2}}</div>
+                    <div id="initial_price">${{product.price|floatformat:2}}</div>
+                    {%for discount in discounts %}
+                    <div class="card_discount">{{discount.discount_amount}}%</div>
+                    {% endfor %}
+                </div>
+                <p class="card_available">Available in the store</p>
+                <hr class="card_hr">
+                <div class="card_buttons">
+                    <button data-product={{product.product_id}} data-action="add" class="btn btn-primary update-cart" id="card_bootstrap_btn">Add to cart</button>
+                    <a href="http://127.0.0.1:8000/checkout/" class="btn btn-primary" id="card_bootstrap_btn">Purchase</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 {% endblock content %}

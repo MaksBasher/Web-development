@@ -1,1 +1,60 @@
 {% extends "base.html" %}
+
+{% block content %}
+<div class="contents_wrapper">
+    <div class="tracking_body">
+        <div>
+            Enter order number
+        </div>
+        <div class='form_body'>
+            <form id="form" action="#">
+                <div class="tracking_form">
+                    <input id="order_number" type="text">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="process">
+        <div class="process_bar_body">
+                <div class="process_bar_item_complete"></div>
+                <div class="process_bar_item_incomplete"></div>
+                <div class="process_bar_item_incomplete"></div>
+        </div>
+        <div class="process_circles_body">
+                <div class="process_circle_item_complete"></div>
+                <div class="process_circle_item_complete"></div>
+                <div class="process_circle_item_incomplete"></div>
+                <div class="process_circle_item_incomplete"></div>
+        </div>   
+        <div class="process_icons_body">
+            <div class="process_icon"><img class="progress_icon" src=""></div>
+            <div class="process_icon"><img class="progress_icon" src=""></div>
+            <div class="process_icon"><img class="progress_icon" src=""></div>
+            <div class="process_icon"><img class="progress_icon" src=""></div>
+        </div>
+    </div>
+    <div class="items_display">
+        <div class="item_body">
+            <img class='item_photo' src="">
+            <div class="item_description">
+                <div class="item_description_text"><br>Balenciaga logo hoodie <br>(Status - *active status*)</div>
+                <div class="item_description_price">Price <br>$359</div>
+            </div>
+        </div>
+        <div class="item_body">
+            <img class='item_photo' src="">
+            <div class="item_description">
+                <div class="item_description_text"><br>Balenciaga logo hoodie <br>(Status - *active status*)</div>
+                <div class="item_description_price">Price <br>$359</div>
+            </div>
+        </div>
+        <div class="item_body">
+            <img class='item_photo' src="">
+            <div class="item_description">
+                <div class="item_description_text"><br>Balenciaga logo hoodie <br>(Status - *active status*)</div>
+                <div class="item_description_price">Price <br>$359</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

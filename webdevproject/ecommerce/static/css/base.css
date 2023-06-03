@@ -1,70 +1,54 @@
 li, a {
+  font-family: 'Inter';
+  font-style: normal;
+  font-size: 22px;
+  color: aliceblue;
+  }
+
+.header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: black;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  }
+
+.navbar-light .navbar-nav .nav-link {
+    color: rgba(255, 0, 0, 0.979);
     font-family: 'Inter';
     font-style: normal;
     font-weight: 300;
     font-size: 24px;
     text-decoration: none;
     color: aliceblue;
-  }
-  
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0.85% 8.5%;
-    background-color: black;
-  }
-  
-.logo {
-    cursor: pointer;
-  }
-  
-.icons_list {
-    list-style: none;
-  }
-  
-.icons_list li{
-    display: inline-block;
-    padding-right: 61px;
-  }
-  
-.icon {
-    width: 64px;
-    height: 64px;
-    cursor: pointer;
-  }
-  
-.nav_links {
-    list-style: none;
-  }
-  
-.nav_links li {
-    display: inline-block;
-    padding-right: 61px;
-  }
-  
-.toggle-button {
-    display: none;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 56px;
-    height: 36px;
-  }
-  
-.toggle-button .bar {
-    height: 3px;
-    width: 100%;
-    background-color: aliceblue;
-    border-radius: 10px;
-  }
-  
-.small_logo {
-    display: none
-  }
-  
-.logo_small {
-    display: none;
-  }
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 0.562);
+}
+
+#header-link {
+  text-decoration: none;
+  gap: 2em;
+}
+
+#header-icons{
+  gap: 1.2em;
+}
+
+.dropdown-menu-end[data-mdb-popper] {
+  right: 0;
+  background-color: white;
+  margin-top: 0.5rem;
+  left: auto;
+}
+
+.dropdown-item {
+  font-size: 0.8em;
+}
 
 .card-img-top {
   width: 100%;
@@ -72,6 +56,7 @@ header {
   border-top-right-radius: calc(0.25rem - 1px);
   padding: 1rem;
 }
+
 
 /* Styles for the text on main page */
 .main_text {
@@ -249,6 +234,9 @@ header {
 
 /* Item cards */
 
+.card-body{ 
+  padding: 1.25rem;
+}
 #item_card_row {
   gap: 1rem;
 }
@@ -256,13 +244,15 @@ header {
 #card_fav{
   position: absolute;
   padding-top: 2rem;
-  padding-left: 15.5rem;
+  padding-left: 14.5rem;
   cursor: pointer;
 }
 
 .card-title {
   margin: 0;
   color: #323232;
+  font-size: 1.2rem;
+  font-weight: 400;
 }
 
 .card_location_container{
@@ -300,6 +290,25 @@ header {
 
 .card_hr {
   margin-top: 0;
+}
+
+.btn-primary {
+  --mdb-btn-bg: #000000;
+  --mdb-btn-color: #fff;
+  --mdb-btn-box-shadow: 0 4px 9px -4px #000000;
+  --mdb-btn-hover-bg: #000000;
+  --mdb-btn-hover-color: #fff;
+  --mdb-btn-focus-bg: #000000;
+  --mdb-btn-focus-color: #fff;
+  --mdb-btn-active-bg: #000000;
+  --mdb-btn-active-color: #fff;
+  --mdb-btn-hover-border-color: #ffffff;
+  --mdb-btn-focus-shadow-rgb: 88,134,210;
+  --mdb-btn-active-border-color: #ffffff;
+  --mdb-btn-active-shadow: 0 8px 9px -4px rgba(0,0,0,0.15),0 4px 18px 0 rgba(0,0,0,0.1);
+  --mdb-btn-disabled-color: #fff;
+  --mdb-btn-disabled-bg: #ffffff;
+  --mdb-btn-disabled-border-color: #ffffff;
 }
 
 .card_buttons {
@@ -662,6 +671,7 @@ background: url(Product_image.png)
 
 .btn{
 	border-radius: 0;
+
 }
 
 .row-image{
@@ -838,3 +848,11 @@ width: 100%;
   justify-content: space-between;
   align-items: center;
 }
+
+/* Adaptives */
+
+@media (min-width: 1400px) {
+  .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+
+    max-width: 1140px;
+}}

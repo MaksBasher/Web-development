@@ -1,0 +1,29 @@
+li {
+    list-style-type: none;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.979);
+}
+.navbar-light .navbar-nav .nav-link:hover {
+    color: rgba(255, 255, 255, 0.562);
+}
+
+.fa-solid, .fas {
+    color: aliceblue;
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+
+.header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0.85% 8.5%;
+    background-color: black;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+  }

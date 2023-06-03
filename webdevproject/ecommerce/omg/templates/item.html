@@ -2,6 +2,7 @@
 {%load static %}
 
 {% block content%}
+<div class='container'>
 <div class="left_section">
     <div class="product_name">{{product.name}}</div>
     <div class="colors">
@@ -82,6 +83,7 @@
     <button type="submit" class="btn">Submit</button>
     <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
     </form>
+</div>
 </div>
 <script type="text/javascript" src="{% static 'js/item.js' %}"></script>
 {%endblock%}

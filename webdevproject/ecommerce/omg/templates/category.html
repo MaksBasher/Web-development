@@ -3,43 +3,40 @@
 
 {% block content %}
 <div class='container'>
-    <!--<div class="brand_description_body">
+     <div class="brand_description_body">
         <div class="brand_description">
+            {%for brand in brands %}
             <div class="brand_logo">
-                <img src="Brand_logo.png">
+                <img src="{{brand.logo.url}}">
             </div>
             <div class="description_flex">
                 <div id="brand_name">
-                    Balenciaga
-                </div>
-                <div class="location_flex">
-                    <div>Location</div>
-                    <div><img src="Store_location.png"></div>
-                    <div>Beijin China</div>
-                </div>
-                <div class="items_count" id="available">
-                    123 items available
+                    {{brand.name}}
                 </div>
             </div>
+            {%endfor%}
         </div>
-    </div> 
-    <div class="brand_photos">
-        <div class="brand_photo"><img src="Brand_photo.png"></div>
-        <div class="brand_photo"><img src="Brand_photo.png"></div> 
-        <div class="brand_photo"><img src="Brand_photo.png"></div>
-        <div class="brand_photo" id="blur">
-             <img src="Brand_photo.png">
+        <div class="brand_photos">
+            {%for product in products%}
+                {%if product.product_id <= 4%}
+                    <div><a href="{% url 'item' product.slug %}"><img class="brand_photo" src="{{product.image.url}}"></a></div>
+                {%endif%}
+            {%endfor%}
+            <div id="blur">
+                <a href="{% url 'categories' %}"><img class="brand_photo" src="{% static 'images/brand_photo.png' %}"></a>
+             </div> 
          </div> 
-         <div class="blur_text">123+</div>
-     </div>  -->
+    </div> 
     <div class='row row-cols-md-3' id="item_card_row">
         {%for product in products %}
         <div class="card" style="width: 18rem;  border-radius: 15px;">
-            <i class="fa-regular fa-heart fa-lg" id="card_fav"></i>
-            <img src="{{product.image.url}}" class="card-img-top" alt="placeholder">
+            <div><button class ="fav_button"><i class="fa-regular fa-heart fa-lg" id="card_fav"></i></button></div>
+            <a href="{% url 'item' product.slug %}">
+                <img src="{{product.image.url}}" class="card-img-top" alt="placeholder">
+            </a>
             <div class="card-body">
                 <a class="card-title" href="{% url 'item' product.slug %}">
-                    <h5 class="card-title" style="margin:0;">{{product.name}}</h5>
+                    <h5 class="card-title" id="title" style="margin:0;">{{product.name}}</h5>
                 </a>
                 <!-- <div class="ratings">
                     <i class="fa-solid fa-star"></i>
@@ -54,13 +51,19 @@
                     <div class="card_location">Beijin,China</div>
                 </div> -->
                 <div class="card_price">
-                    <div id="current_price">${{product.price|floatformat:2}}</div>
+                    {% if product.discount_amount %}
+                    <div id="current_price">${{product.get_discount_price|floatformat:2}}</div>
                     <div id="initial_price">${{product.price|floatformat:2}}</div>
-                    {%for discount in discounts %}
-                    <div class="card_discount">{{discount.discount_amount}}%</div>
-                    {% endfor %}
+                    <div class="card_discount">{{product.discount_amount|floatformat:0}}%</div>
+                    {%else%}
+                    <div id="current_price">${{product.price|floatformat:2}}</div>
+                    {% endif%}
                 </div>
+                {% if product.stock_status == "Available in the store" %}
                 <p class="card_available">Available in the store</p>
+                {% else%}
+                <p class="card_unavailable">Out of stock</p>
+                {%endif%}
                 <hr class="card_hr">
                 <div class="card_buttons">
                     <button data-product={{product.product_id}} data-action="add" class="btn btn-primary update-cart" id="card_bootstrap_btn">Add to cart</button>

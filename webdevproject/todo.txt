@@ -1,37 +1,5 @@
-///MAIN PAGE///
-1. Add slider functionality
-2. Change header
-
-///USER AUTH PAGES///
-1. Change registration form fields and delete username
-2. Change login page fields to email and password
-3. Add social media logins
-4. Add logout
-5. Add Password reset
-
-///ITEM_CATALOG(CATEGORIES) PAGE///
-1. Add in stock\out of stock
-2. Add filters
-3. Add brand overview (improve template)
-
-///ITEM PAGE///
-1. Add dynamic discounts
-2. Add dynamic colors
-3. Add review functionality
-4. Add photos functionality
-5. Add favorites functionality
-6. Fix the problem with rendering only 1 model
-7. Fix product description view
-8. Fix images background
-
-///FAVORITES PAGE///
-1. Add favorites functionality
-
-///CHECKOUT & CART PAGE///
-1. Add links to the item PAGES
-2. Make dynamic items withtin the cart (add/delete)
-
-///TRACKING PAGE///
-1. Add tracking page template
-2. Make functionality based on the order number (id)
-3. 
+Profile page design
+Add favorites
+Add tracking functionality
+Redisign item view page
+Social media login

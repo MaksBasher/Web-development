@@ -1,4 +1,5 @@
-from django.shortcuts import  render, redirect
+import datetime
+from django.shortcuts import  get_object_or_404, render, redirect
 from django.views import generic
 from .models import *
 from django import forms
@@ -7,7 +8,8 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm
 from django.contrib.auth.models import User
-from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.mail import send_mail, BadHeaderError
 from django.template.loader import render_to_string
 from django.db.models.query_utils import Q
@@ -15,12 +17,27 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 import json
+from .utils import *
 
 # Create your views here.
 
 #Home page views
 def index(request):
-    my_dict = {"insert_me": "I am from views.py"}
+    products = Product.objects.all()
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Order.objects.get_or_create(customer = customer, complete=False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+    else:
+        items = []
+        order = {'get_cart_total':0,'get_cart_items':0}
+        cartItems = order['get_cart_items']
+        
+    my_dict = {'items':items,
+               'order':order,
+               'cartItems': cartItems,
+               'products':products}
     return render(request,'index.html',context=my_dict)
 
 #News views 
@@ -36,9 +53,34 @@ class NewsDetail(generic.DetailView):
 def category(request):  
     products = Product.objects.all()
     discounts = Discount.objects.all()
+    brands = Brand.objects.all()
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Order.objects.get_or_create(customer = customer, complete=False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+    else:
+        items = []
+        order = {'get_cart_total':0,'get_cart_items':0}
+        cartItems = order['get_cart_items'] 
     context = {'products': products, 
-               'discounts': discounts,}
+               'discounts': discounts,
+               'cartItems': cartItems,
+               'order':order,
+               'items':items,
+               'brands':brands
+               }
     return render(request, 'category.html', context)
+
+
+def fav_item (request, id):
+    product = get_object_or_404(Product, id=id)
+    if product.favorite.filter(id=request.user.id).exists():
+        product.favorite.remove(request.user)
+    else:
+        product.favorite.add(request.user)
+    return HttpResponseRedirect(product.get_absolute_url())
+
 
 #Items views
 class ProductView(generic.DetailView):
@@ -60,7 +102,7 @@ def updateItem(request):
     print('Action:', action)
     print('Product:', productId)
     
-    customer = request.user.customer
+    customer = request.user
     product = Product.objects.get(product_id=productId)
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
     
@@ -81,67 +123,118 @@ def updateItem(request):
 
 #Tracking views
 def tracking(request):
-     context = {}
-     return render(request, 'tracking.html', context)
-     
-#Cart views
-def cart(request):
-    
     if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer = customer, complete=False)
+        customer = request.user
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
-        try:
-            cart = json.loads(request.COOKIES['cart'])
-        except:
-            cart = {}
-        print('Cart:',cart)
-        items = []
-        order = {'get_cart_total':0,'get_cart_items':0, 'shipping':False}
-        cartItems = order ['get_cart_items']
+        cookieData = cookieCart(request)
+        cartItems = cookieData['cartItems']
+        order = cookieData['order']
+        items = cookieData['items']
         
-        for i in cart:
-            cartItems += cart[i]['quantity']
-            
-            product = Product.objects.get(product_id = i)
-            total = (product.price * cart[i]["quantity"])
+    context = {'cartItems':cartItems ,'order':order, 'items':items}
+    return render(request, 'tracking.html', context)
+     
+#Cart views
+def cart(request):
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+    else:
+        cookieData = cookieCart(request)
+        cartItems = cookieData['cartItems']
+        order = cookieData['order']
+        items = cookieData['items']
         
-            order['get_cart_total'] += total
-            order['get_cart_items'] += cart[i]['quantity']
-            
-            item = {
-                'product':{
-                    'id':product.product_id,
-                    'name':product.name,
-                    'price':product.price,
-                    'imageURL':product.imageURL,
-                },
-                'quantity':cart[i]['quantity'],
-                'get_total':total
-            }
-            items.append(item)
-        
-    context = {'items':items,
-               'order':order,
-               'cartItems': cartItems}
+    context = {'cartItems':cartItems ,'order':order, 'items':items}
     return render(request, 'cart.html', context)
 
 #Checkout views    
 def checkout(request):
     if request.user.is_authenticated:
-        customer = request.user.customer
+        customer = request.user
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+    else:
+        cookieData = cookieCart(request)
+        cartItems = cookieData['cartItems']
+        order = cookieData['order']
+        items = cookieData['items']
+        
+    context = {'cartItems':cartItems ,'order':order, 'items':items}
+    return render(request, 'checkout.html', context)
+
+def processOrder(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    tracking_number = id_generator()
+    data = json.loads(request.body)
+    
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Order.objects.get_or_create(customer = customer, complete=False)
+        total = data['form']['total']
+        order.transaction_id = transaction_id
+        order.tracking_number = tracking_number
+        order.complete = True
+        order.save()
+        
+        if order.shipping == True:
+           ShippingAddress.objects.create(
+               customer = request.user,
+               order = order,
+               address = data['shipping']['address'],
+               city = data['shipping']['city'],
+               state = data['shipping']['state'],
+               zipcode = data['shipping']['zipcode'],
+               country = data['shipping']['country']
+           )
+       
+    else: 
+        print("User not logged in..")
+        
+    return JsonResponse('Payment submitted..', safe=False)
+
+#Profile page
+@login_required
+def profile(request):
+    profile = Customer.objects.all()
+    if request.user.is_authenticated:
+        customer = request.user
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+    else:
+        cookieData = cookieCart(request)
+        cartItems = cookieData['cartItems']
+        order = cookieData['order']
+        items = cookieData['items']
+        
+    context = {'cartItems':cartItems ,'order':order, 'items':items, 'profile':profile}
+    return render(request,'profile.html', context)
+
+
+#Favorites page
+def favorite(request):
+    if request.user.is_authenticated:
+        customer = request.user
         order, created = Order.objects.get_or_create(customer = customer, complete=False)
         items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
     else:
         items = []
         order = {'get_cart_total':0,'get_cart_items':0}
+        cartItems = order['get_cart_items']
         
     context = {'items':items,
-               'order':order}
-    return render(request, 'checkout.html', context)
- 
+               'order':order,
+               'cartItems': cartItems}
+    return render(request,'favorite.html', context)
+
 #User auth views
 class NewUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -170,7 +263,7 @@ def register_request(request):
             user = form.save()
             login(request, user)
             messages.success(request, "Registration successful." )
-            return redirect("home")
+            return redirect("profile")
         messages.error(request, "Unsuccessful registration. Invalid information.")
     form = NewUserForm()
     return render (request=request, template_name="register.html", context={"register_form":form})
@@ -185,7 +278,7 @@ def login_request(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}.")
-                return redirect("home")
+                return redirect("profile")
             else:
                 messages.error(request,"Invalid username or password.")
     form = AuthenticationForm()

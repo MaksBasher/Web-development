@@ -11,9 +11,9 @@
   </div>
   <div class="signin_body_flex">
       <div class="buttons_flex">
-          <a href="{% url 'register' %}"><div><button class="header_button" id="join">JOIN</button></div></a>
+          <a href="{% url 'register' %}"><div><button class="header_button" id="join" style="border-bottom: 2px solid rgba(163, 163, 163, 0.7);">JOIN</button></div></a>
           <div id="divider"></div>
-          <a href="{% url 'login' %}"><div><button class="header_button" id="signin">SIGN IN</button></div></a>
+          <a href="{% url 'login' %}"><div><button class="header_button" id="signin" style='border-bottom: 2px solid rgb(0, 0, 0);'>SIGN IN</button></div></a>
       </div>
       <form method="POST">
         {% csrf_token %}

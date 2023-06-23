@@ -2,7 +2,15 @@
 {% load static %}
 
 {% block content %}
-<div class="main_text">
-    DISCOVER FASHION WITHOUT LIMITS
-</div>
-{%endblock%}
+    <div class="main_text">DISCOVER FASHION WITHOUT LIMITS</div>
+    <div class="marquee">
+        <div class="marquee--inner">
+          <span class="marque-flex" id='marque_span'>
+            {%for product in products %}
+            <div class="scroller_item" id="first"><a href="{% url 'item' product.slug %}"><img class = "marquee_photo" src="{{product.image.url}}"></a></div>
+            <div class="scroller_item" id="first"><a href="{% url 'item' product.slug %}"><img class = "marquee_photo" src="{{product.image.url}}"></a></div>
+            {%endfor%}
+        </span>
+        </div>
+      </div>
+  {%endblock%}

@@ -1,3 +1,5 @@
+import random
+import string
 from django.db import models
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
@@ -5,14 +7,30 @@ from django.utils.text import slugify
 
 # Create your models here.
 
+#Status for the news
 STATUS = (
     (0,"Draft"),
     (1,"Publish")
 )
 
+#Status for the item
+in_stock = "Available in the store"
+out_stock = "Out of stock"
 ITEM_STATUS = (
-    (0,"Out of Stock"),
-    (1,"In Stock")
+    (in_stock,"1"),
+    (out_stock,"0")
+)
+
+#Status for the order
+delivered = "Your order has been delivered"
+in_transit = "Your order is in transit"
+proceeded = "Your order has been proceeded"
+recieved = "Your order has been recieved"
+ORDER_STATUS = (
+    (delivered,"3"),
+    (in_transit,"2"),
+    (proceeded,"1"),
+    (recieved,"0")
 )
 
 class News(models.Model):
@@ -53,7 +71,7 @@ class Discount(models.Model):
     discount_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     description = models.TextField(max_length=500)
-    discount_amount = models.DecimalField(max_digits=3, decimal_places=2)
+    discount_amount = models.DecimalField(max_digits=5, decimal_places=2)
     active = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now= True)
@@ -101,12 +119,15 @@ class Product(models.Model):
     slug = models.SlugField(max_length = 250, null = True, blank = True, unique=True)
     description = models.TextField(max_length=500)
     SKU = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.FloatField()
     category = models.ForeignKey(Product_Category, on_delete= models.CASCADE)
-    stock_status = models.IntegerField(choices=ITEM_STATUS, default=0)
-    discount_id = models.ForeignKey(Discount, on_delete=models.CASCADE)
+    stock_status = models.CharField(max_length=64, choices=ITEM_STATUS, default=in_stock)
+    stock = models.CharField(max_length=64, default=1, blank=True, null=True)
+    discount_id = models.ForeignKey(Discount, on_delete=models.CASCADE, default=None, blank=True, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now= True)
+    discount_amount = models.FloatField(default=0, null=True, blank=True)
+    digital = models.BooleanField(default=False,null=True, blank=True)
     
     class Meta:
         ordering = ['product_id']
@@ -127,50 +148,68 @@ class Product(models.Model):
         except:
             url = ''
         return url
+    
+    #Calculating the discount price
+    @property
+    def get_discount_price(self):
+        discounted_price = self.price - (self.price * (float(self.discount_amount)/100))
+        return discounted_price
 
 class Order(models.Model):
-	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
-	ordered_on = models.DateTimeField(auto_now_add=True)
-	complete = models.BooleanField(default=False)
-	transaction_id = models.CharField(max_length=100, null=True)
+    customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    ordered_on = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)
+    transaction_id = models.CharField(max_length=100, null=True)
+    tracking_number = models.CharField(max_length=100, null=True)
+    order_status = models.CharField(max_length=64, choices=ORDER_STATUS, default=recieved)
 
-	def __str__(self):
-		return str(self.id)
-		
-	@property
-	def shipping(self):
-		shipping = False
-		orderitems = self.orderitem_set.all()
-		for i in orderitems:
-			if i.product.digital == False:
-				shipping = True
-		return shipping
+    def __str__(self):
+        return str(self.id)
+        
+    @property
+    def shipping(self):
+        shipping = True
+        return shipping
+    
+    @property
+    def get_cart_total(self):
+            orderitems = self.orderitem_set.all()
+            total = sum([item.get_total for item in orderitems])
+            return total 
 
-	@property
-	def get_cart_total(self):
-		orderitems = self.orderitem_set.all()
-		total = sum([item.get_total for item in orderitems])
-		return total 
-
-	@property
-	def get_cart_items(self):
-		orderitems = self.orderitem_set.all()
-		total = sum([item.quantity for item in orderitems])
-		return total 
+    @property
+    def get_cart_discount_total(self):
+            orderitems = self.orderitem_set.all()
+            discount = sum([item.get_discount_total for item in orderitems])
+            total = sum([item.get_total for item in orderitems])
+            discounted_total = total - (total - discount)
+            return discounted_total
+        
+    @property
+    def get_cart_items(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitems])
+        return total 
+    
 
 class OrderItem(models.Model):
-	product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-	order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-	quantity = models.IntegerField(default=0, null=True, blank=True)
-	created_on = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=0, null=True, blank=True)
+    created_on = models.DateTimeField(auto_now_add=True)
 
-	@property
-	def get_total(self):
-		total = self.product.price * self.quantity
-		return total
+    @property
+    def get_total(self):
+        total = self.product.price * self.quantity
+        return total
+    
+    @property
+    def get_discount_total(self):
+        discount_total = self.product.get_discount_price * self.quantity
+        return discount_total
 
 class ShippingAddress(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     country = models.CharField(max_length=200, null=False)
     city = models.CharField(max_length=200, null=False)
